@@ -67,10 +67,10 @@ function injectTopBanner() {
     <div class="banner">
       <div>🔓 Medium Reader: Paywall Detected</div>
       <div class="btns">
-        <button id="proxy-freedium">Freedium</button>
+        <button id="proxy-freedium">Freedium Mirror</button>
+        <button id="proxy-archive" class="archive">Archive.ph</button>
         <button id="proxy-smry" class="smry">Smry.ai</button>
-        <button id="proxy-archive" class="archive">Archive.is</button>
-        <button id="proxy-google">Google Cache</button>
+        <button id="proxy-remove">RemovePaywall</button>
         <button class="close" id="close-btn">×</button>
       </div>
     </div>
@@ -83,10 +83,10 @@ function injectTopBanner() {
   target.prepend(host);
   if (document.body) document.body.style.marginTop = '45px';
 
-  shadow.getElementById('proxy-freedium').onclick = () => window.location.href = `https://freedium.cfd/${window.location.href}`;
+  shadow.getElementById('proxy-freedium').onclick = () => window.location.href = `https://freedium-mirror.cfd/${window.location.href}`;
+  shadow.getElementById('proxy-archive').onclick = () => window.location.href = `https://archive.ph/${window.location.href}`;
   shadow.getElementById('proxy-smry').onclick = () => window.location.href = `https://smry.ai/proxy?url=${encodeURIComponent(window.location.href)}`;
-  shadow.getElementById('proxy-archive').onclick = () => window.location.href = `https://archive.is/latest/${window.location.href}`;
-  shadow.getElementById('proxy-google').onclick = () => window.location.href = `https://webcache.googleusercontent.com/search?q=cache:${encodeURIComponent(window.location.href)}`;
+  shadow.getElementById('proxy-remove').onclick = () => window.location.href = `https://www.removepaywall.com/search?url=${window.location.href}`;
   shadow.getElementById('close-btn').onclick = () => {
     host.remove();
     if (document.body) document.body.style.marginTop = '0';

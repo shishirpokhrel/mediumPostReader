@@ -1,8 +1,8 @@
 document.getElementById('forceUnlockBtn').addEventListener('click', async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab && tab.url) {
-        // Default to Freedium for force unlock
-        window.open(`https://freedium.cfd/${tab.url}`, '_blank');
+        // Default to Freedium Mirror for force unlock
+        window.open(`https://freedium-mirror.cfd/${tab.url}`, '_blank');
     }
 });
 
