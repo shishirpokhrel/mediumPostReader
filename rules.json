@@ -9,6 +9,11 @@
                     "header": "referer",
                     "operation": "set",
                     "value": "https://www.google.com/"
+                },
+                {
+                    "header": "User-Agent",
+                    "operation": "set",
+                    "value": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
                 }
             ]
         },
@@ -16,7 +21,8 @@
             "urlFilter": "*://*.medium.com/*",
             "resourceTypes": [
                 "main_frame",
-                "sub_frame"
+                "sub_frame",
+                "xmlhttprequest"
             ]
         }
     }
