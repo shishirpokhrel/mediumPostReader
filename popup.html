@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
   <div class="container">
     <header>
       <h1>Medium Reader</h1>
-      <p>Bypass limits instantly</p>
+      <p>Brave & Custom Domain Ready</p>
     </header>
-    
+
     <div class="actions">
-      <button id="unlockBtn" class="primary-btn">🔓 Unpaywall Now</button>
-      <button id="clearCookiesBtn" class="secondary-btn">🧹 Clear Cookies</button>
+      <button id="forceUnlockBtn" class="primary-btn">⚡ Force Unlock Page</button>
+      <button id="clearCookiesBtn" class="secondary-btn">🧹 Deep Data Reset</button>
     </div>
 
-    <div class="status" id="statusMsg"></div>
+    <div class="status-box">
+      <div id="statusMsg">Detecting Medium...</div>
+      <div id="domainInfo" style="font-size: 10px; color: #a0a0a0; margin-top: 4px;"></div>
+    </div>
 
     <footer>
-      <p>Powered by Freedium & Referer Spoofing</p>
+      <p>Proxies: Freedium, Smry, Archive</p>
     </footer>
   </div>
   <script src="popup.js"></script>
 </body>
+
 </html>

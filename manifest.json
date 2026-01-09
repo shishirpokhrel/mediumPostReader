@@ -8,11 +8,12 @@
     "storage",
     "activeTab",
     "scripting",
-    "cookies"
+    "cookies",
+    "browsingData",
+    "notifications"
   ],
   "host_permissions": [
-    "*://*.medium.com/*",
-    "*://medium.com/*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"
@@ -27,16 +28,22 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.medium.com/*", "*://medium.com/*"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
     }
   ],
   "declarative_net_request": {
-    "rule_resources": [{
-      "id": "ruleset_1",
-      "enabled": true,
-      "path": "rules.json"
-    }]
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
   }
 }

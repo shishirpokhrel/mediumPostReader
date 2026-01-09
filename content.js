@@ -1,65 +1,111 @@
-// Detect paywall patterns
-const paywallSelectors = [
+// 1. Detection Logic with broad meta & link checks
+function isMedium() {
+  const metaTags = [
+    'meta[property="og:site_name"][content*="Medium"]',
+    'meta[name="al:ios:app_name"][content="Medium"]',
+    'meta[property="al:ios:app_name"][content="Medium"]',
+    'meta[name="twitter:app:id:googleplay"][content="com.medium.reader"]',
+    'meta[name="medium-site"]',
+    'link[rel="search"][type="application/opensearchdescription+xml"][href*="medium.com"]'
+  ];
+  const detected = metaTags.some(selector => document.querySelector(selector)) ||
+    window.location.hostname.includes('medium.com');
+
+  if (detected) console.log("%c[Medium Reader]%c Medium platform detected!", "color: purple; font-weight: bold", "color: inherit");
+  return detected;
+}
+
+function hasPaywall() {
+  const selectors = [
     '.pw-unlocked-post-overlay',
     '.pw-multi-link-post-overlay',
-    '#paywall-background-color',
     '[data-test-id="post-sidebar-cta-model"]',
     '.extreme-blur',
-    'div[style*="background-color: rgba(255, 255, 255, 0.9)"]',
-    'div.l.bg-cover'
-];
+    'div.pw-regwall',
+    '#paywall-wrapper',
+    'div[style*="rgba(255, 255, 255, 0.9)"]',
+    '#paywall-background-color'
+  ];
+  const foundPaywall = selectors.some(s => document.querySelector(s)) ||
+    document.body?.style.overflow === 'hidden' ||
+    document.documentElement?.style.overflow === 'hidden';
 
-function checkPaywall() {
-    const isPaywalled = paywallSelectors.some(selector => document.querySelector(selector));
-
-    // Also check for hidden overflow on body/html which usually indicates an overlay
-    const hasHiddenOverflow = document.body.style.overflow === 'hidden' ||
-        document.documentElement.style.overflow === 'hidden';
-
-    if (isPaywalled || hasHiddenOverflow) {
-        // Force cleanup
-        document.body.style.overflow = 'auto';
-        document.documentElement.style.overflow = 'auto';
-
-        // Hide known overlays
-        paywallSelectors.forEach(selector => {
-            const el = document.querySelector(selector);
-            if (el) el.style.display = 'none';
-        });
-
-        injectUnlockButton();
-    }
+  if (foundPaywall) console.log("%c[Medium Reader]%c Paywall elements detected!", "color: red; font-weight: bold", "color: inherit");
+  return foundPaywall;
 }
 
-function injectUnlockButton() {
-    if (document.getElementById('medium-post-reader-unlock-btn')) return;
+// 2. Shadow DOM Banner Injection (Shield-proof)
+function injectTopBanner() {
+  if (document.getElementById('medium-reader-host')) return;
 
-    const btn = document.createElement('div');
-    btn.id = 'medium-post-reader-unlock-btn';
-    btn.innerHTML = `
-    <div style="position: fixed; bottom: 30px; right: 30px; z-index: 10000; background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-family: 'Inter', sans-serif; font-weight: bold; box-shadow: 0 10px 25px rgba(255, 65, 108, 0.5); border: 2px solid white; animation: pulse 2s infinite;">
-      🚀 FULL UNLOCK (FREEDIUM)
-    </div>
+  const host = document.createElement('div');
+  host.id = 'medium-reader-host';
+  host.style = 'position: fixed; top: 0; left: 0; width: 100%; z-index: 2147483647;';
+
+  const shadow = host.attachShadow({ mode: 'closed' });
+
+  const banner = document.createElement('div');
+  banner.innerHTML = `
     <style>
-      @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+      .banner {
+        background: linear-gradient(90deg, #1e3a8a 0%, #7e22ce 100%);
+        color: white; padding: 12px 20px; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5); font-weight: bold; font-size: 14px;
       }
+      .btns { display: flex; gap: 8px; }
+      button {
+        background: white; color: #1e3a8a; border: none; padding: 6px 14px; 
+        border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;
+        transition: transform 0.1s, background 0.2s;
+      }
+      button:hover { transform: translateY(-1px); background: #f3f4f6; }
+      button.smry { color: #7e22ce; }
+      button.archive { color: #ef4444; }
+      .close { background: transparent; color: white; border: none; font-size: 20px; cursor: pointer; padding: 0 5px; }
     </style>
+    <div class="banner">
+      <div>🔓 Medium Reader: Paywall Detected</div>
+      <div class="btns">
+        <button id="proxy-freedium">Freedium</button>
+        <button id="proxy-smry" class="smry">Smry.ai</button>
+        <button id="proxy-archive" class="archive">Archive.is</button>
+        <button id="proxy-google">Google Cache</button>
+        <button class="close" id="close-btn">×</button>
+      </div>
+    </div>
   `;
 
-    btn.onclick = () => {
-        const currentUrl = window.location.href;
-        window.location.href = `https://freedium.cfd/${currentUrl}`;
-    };
+  shadow.appendChild(banner);
 
-    document.body.appendChild(btn);
+  // Wait for body to exist
+  const target = document.body || document.documentElement;
+  target.prepend(host);
+  if (document.body) document.body.style.marginTop = '45px';
+
+  shadow.getElementById('proxy-freedium').onclick = () => window.location.href = `https://freedium.cfd/${window.location.href}`;
+  shadow.getElementById('proxy-smry').onclick = () => window.location.href = `https://smry.ai/proxy?url=${encodeURIComponent(window.location.href)}`;
+  shadow.getElementById('proxy-archive').onclick = () => window.location.href = `https://archive.is/latest/${window.location.href}`;
+  shadow.getElementById('proxy-google').onclick = () => window.location.href = `https://webcache.googleusercontent.com/search?q=cache:${encodeURIComponent(window.location.href)}`;
+  shadow.getElementById('close-btn').onclick = () => {
+    host.remove();
+    if (document.body) document.body.style.marginTop = '0';
+  };
 }
 
-// Check on load
-checkPaywall();
+// 3. Execution Loop
+function loop() {
+  if (isMedium()) {
+    // Initial cleanup of body overflow
+    if (document.body) document.body.style.overflow = 'auto';
+    if (document.documentElement) document.documentElement.style.overflow = 'auto';
 
-// Observe for dynamic changes
-const observer = new MutationObserver(checkPaywall);
-observer.observe(document.body, { childList: true, subtree: true });
+    if (hasPaywall()) {
+      injectTopBanner();
+    }
+  }
+}
+
+// Polling is most reliable for SPA-like navigation in Medium
+setInterval(loop, 2000);
+setTimeout(loop, 500); // Initial fast check
