@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Medium Post Reader",
-  "version": "1.0",
-  "description": "Read Medium posts without limits. Bypasses paywalls using referrer spoofing and proxy Fallbacks.",
+  "name": "Medium Post Reader - Unlimited Free Articles",
+  "version": "1.3",
+  "description": "Bypass Medium paywalls and read unlimited free articles in 2026. Optimized for Chrome and Brave. Includes Freedium and Archive mirrors.",
   "permissions": [
     "declarativeNetRequest",
     "storage",
